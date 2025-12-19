@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.29;
 
-import "../lib/openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
-import "../lib/openzeppelin-contracts/contracts/token/ERC1155/IERC1155Receiver.sol";
-import "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import {IERC1155} from "../lib/openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
+import {IERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 /// @title NFT Staking Contract
 /// @author Daniel Petronilha
 /// @notice A contract for staking ERC1155 NFTs and receiving rewards in ERC20 tokens based on staking duration
 contract NftStaker {
-  IERC1155 public parentNFT;
+  IERC1155 public parentNft;
 
   IERC20 public token;
 
@@ -26,7 +25,7 @@ contract NftStaker {
   mapping(address staker => uint256 totalStakingTime) public stakingTime;
 
   constructor(address contrato, address rewardToken) {
-    parentNFT = IERC1155(contrato);
+    parentNft = IERC1155(contrato);
     token = IERC20(rewardToken);
   }
 
@@ -35,7 +34,7 @@ contract NftStaker {
   /// @param _amount The amount of NFTs to stake
   function stake(uint256 _tokenId, uint256 _amount) public {
     require(_amount > 0, "Amount must be greater than 0");
-    parentNFT.safeTransferFrom(msg.sender, address(this), _tokenId, _amount, "0x00");
+    parentNft.safeTransferFrom(msg.sender, address(this), _tokenId, _amount, "0x00");
     stakes[msg.sender] = Stake({
       tokenId: _tokenId,
       amount: _amount,
@@ -53,7 +52,7 @@ contract NftStaker {
     stakingTime[msg.sender] += stakingDuration;
 
     // Transfer the staked NFTs back to the user
-    parentNFT.safeTransferFrom(address(this), msg.sender, userStake.tokenId, userStake.amount, "0x00");
+    parentNft.safeTransferFrom(address(this), msg.sender, userStake.tokenId, userStake.amount, "0x00");
 
     // Clear the stake
     delete stakes[msg.sender];
